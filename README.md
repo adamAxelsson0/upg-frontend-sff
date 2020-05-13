@@ -33,6 +33,7 @@ Det skall visas ett omslag för varje film.
 Det skall finnas ett formulär för att registrera en ny filmstudio.
 En filmstudio skall kunna logga in med sitt användarnamn "name" samt lösenord "password".
 En inloggad filmstudio skall kunna låna en film, lämna tillbaka en film samt skriva en trivia om en film.
+
 Krav för VG
 
 En film skall bara kunna lånas det antal gånger totalt som det finns licenser "stock".
