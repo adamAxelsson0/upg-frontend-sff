@@ -14,17 +14,19 @@ async function GetMovies() {
                 "is not known or must remain generic; that which holds, denotes or "+
                 "reserves a place for something to come later."
             }
-
             let movieCard = document.createElement("div");
             movieCard.innerHTML = 
             "<div class=\"card\">" +
-                "<img src=\"https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png\" style=\"width:100% \" >" +
+                "<img src=\"https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png\" style=\"width:100%\" >" +
                     "<div class=\"container\">" +
-                        `<h4><b>${movie.name}</b></h4>` +
+                        `<h2><b>${movie.name}</b></h2>` +
                         `<p>${movie.description}</p>` +
                         `<p>In stock: ${movie.stock}</p>` +
                     "</div>" +
-            "</div>"
+                    "<div class=\"card-footer\">"+
+                    "<small class=\"text-muted\">Last updated x mins ago</small>"+
+                    "</div>"
+            "</div>"+
 
             movieDiv.insertAdjacentElement("beforeend", movieCard);
         });
