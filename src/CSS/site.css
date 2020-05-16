@@ -92,10 +92,8 @@ body{
   }
 
   @media screen and (max-width: 600px) {
-    .topnav .login-container {
-      float: none;
-    }
-    .topnav a, .topnav input[type=text], .topnav input[type=password] , .topnav .login-container button, .topnav .login-container p {
+    .topnav a, .topnav input[type=text], .topnav input[type=password], .topnav .login-container, 
+    .topnav .login-container button, .topnav .login-container p {
       float: none;
       display: block;
       text-align: left;
