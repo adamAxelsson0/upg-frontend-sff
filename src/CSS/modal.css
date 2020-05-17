@@ -22,9 +22,13 @@
   }
   .modal-header {
     padding: 2px 16px;
-    background-color: #5cb85c;
+    background-color: #d60e7c;
     color: white;
   }
+  .modal-body {
+    background-color: #ce7693;
+  }
+  
   
   /* The Close Button */
   .close {

@@ -33,13 +33,11 @@ function ShowLogin(){
 }
 function LoggedIn(){
     const loginDiv = document.getElementById("login");
-    loginDiv.innerHTML = "";
-
-    loginDiv.insertAdjacentElement("beforeend" , '<div class="login-container">'+
+    user = localStorage.getItem('user');
+    loginDiv.innerHTML = '<div class="login-container">'+
     '<button type="submit" onclick="Logout()">Logout</button>'+
-    `<p>Logged in as ${localStorage.getItem("user")}</p>`+
-    '</div>');
-
+    `<p>Logged in as ${user.name}</p>`+
+    '</div>';
 }
 async function Login(){
     let user, password ="";
@@ -51,9 +49,8 @@ async function Login(){
         const data = await response.json();
 
         data.forEach(user => {
-            if(user.password == pw && user.name == userName){
+            if(user.password == pw && user.name == userName && user.verified == true){
                 localStorage.setItem("user", user);
-                console.log("got here");
             }
         });
         if(localStorage.getItem("user") == null){
@@ -94,7 +91,6 @@ async function TryRegister(){
     var userName = document.getElementById("uname").value;
     var passWord = document.getElementById("psw").value;
     var filmstudio =  { name: userName, password: passWord, verified: false};
-    console.log(filmstudio)
     try {
         let response = await fetch('https://localhost:5001/api/filmstudio', {
             method: 'POST',
