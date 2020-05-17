@@ -15,13 +15,13 @@ function ShowLogin(){
     loginDiv.innerHTML = 
     '<div class="login-container">'+
      `<button onclick="Register()">Register</button>` +
-         '<div id="modal" class="modal">' +
+         '<div id="modal-register" class="modal">' +
          '<div class="modal-content">'+
          '<div class="modal-header">'+
            '<span class="close">&times;</span>'+
            `<h2>Register account</h2>`+
          '</div>'+
-         '<div id="modal-body" class="modal-body">'+
+         '<div id="modal-body-register" class="modal-body">'+
             
          '</div>'+
        '</div>'+
@@ -35,7 +35,7 @@ function LoggedIn(){
     const loginDiv = document.getElementById("login");
     loginDiv.innerHTML = "";
 
-    loginDiv.insertAdjacentHTML("afterbegin" , '<div class="login-container">'+
+    loginDiv.insertAdjacentElement("beforeend" , '<div class="login-container">'+
     '<button type="submit" onclick="Logout()">Logout</button>'+
     `<p>Logged in as ${localStorage.getItem("user")}</p>`+
     '</div>');
@@ -68,11 +68,16 @@ async function Logout() {
     localStorage.removeItem("user");
     ShowLogin();
 }
-async function Register() {
-    var modal = document.getElementById("modal");
-    var span = document.getElementsByClassName("close")[0];
-    const triviaBody = document.getElementById("modal-body");
 
+
+async function Register() {
+    var modal = document.getElementById("modal-register");
+    var span = document.getElementsByClassName("close")[0];
+    const registerBody = document.getElementById("modal-body-register");
+
+    registerBody.innerHTML = '<input type="text" placeholder="Enter Username" id="uname" required>'+
+    '<input type="password" placeholder="Enter Password" id="psw" required>'+
+    '<button type="submit" onclick="TryRegister()">Register</button>';
 
     modal.style.display = "block";
 
@@ -83,5 +88,29 @@ async function Register() {
       if (event.target == modal) {
         modal.style.display = "none";
       }
+    }
+}
+async function TryRegister(){
+    var userName = document.getElementById("uname").value;
+    var passWord = document.getElementById("psw").value;
+    var filmstudio =  { name: userName, password: passWord, verified: false};
+    console.log(filmstudio)
+    try {
+        let response = await fetch('https://localhost:5001/api/filmstudio', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json;charset=utf-8'
+            },
+            body: JSON.stringify(filmstudio)
+          });
+          
+          let result = await response.json();
+          alert(result.name + " has been registered and is waiting approval.");
+
+        const registerBody = document.getElementById("modal-body-register");
+        registerBody.innerHTML = "<p>Your account is waiting approval</p>";
+
+    } catch (error) {
+        
     }
 }

@@ -26,7 +26,7 @@ async function GetMovies() {
 
                     "<div class=\"card-footer\">"+
                     `<button onclick="ShowTrivia(${movie.id})">Trivia</button>` +
-                        '<div id="modal" class="modal">' +
+                        '<div id="modal-trivia" class="modal">' +
                         '<div class="modal-content">'+
                         '<div class="modal-header">'+
                           '<span class="close">&times;</span>'+
@@ -48,7 +48,7 @@ async function GetMovies() {
 async function ShowTrivia(id) {
     const response = await fetch("https://localhost:5001/api/filmTrivia");
     const data = await response.json();
-    var modal = document.getElementById("modal");
+    var modal = document.getElementById("modal-trivia");
     var span = document.getElementsByClassName("close")[0];
     const triviaBody = document.getElementById("modal-body");
 
