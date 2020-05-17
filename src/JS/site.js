@@ -1,5 +1,4 @@
 GetMovies();
-const mainDiv = document.getElementById("main");
 
 async function GetMovies() {
     try {
@@ -24,14 +23,57 @@ async function GetMovies() {
                         `<p>${movie.description}</p>` +
                         `<p>In stock: ${movie.stock}</p>` +
                     "</div>" +
+
                     "<div class=\"card-footer\">"+
-                        `<a href='http://127.0.0.1:5500/src/Pages/trivia.html?movie=${movie.id}' class='button'>Trivia</a>`
-                        "<small class=\"text-muted\">Last updated x mins ago</small>"+
+                    `<button onclick="ShowTrivia(${movie.id})">Trivia</button>` +
+                        '<div id="modal" class="modal">' +
+                        '<div class="modal-content">'+
+                        '<div class="modal-header">'+
+                          '<span class="close">&times;</span>'+
+                          `<h2>Trivia for ${movie.name}</h2>`+
+                        '</div>'+
+                        '<div id="modal-body">'+
+                        '</div>'+
+                      '</div>'+
+                        '</div>'+
                     "</div>"
+
             "</div>"+
             movieDiv.insertAdjacentElement("beforeend", movieCard);
         });
     } catch (error) {
         console.log(error);
     }
+}
+async function ShowTrivia(id) {
+    const response = await fetch("https://localhost:5001/api/filmTrivia");
+    const data = await response.json();
+    var modal = document.getElementById("modal");
+    var span = document.getElementsByClassName("close")[0];
+    const triviaBody = document.getElementById("modal-body");
+
+    data.forEach(trivia => {
+        let triviaContent = document.createElement("div");
+        triviaContent.innerHTML =
+        `<p>${trivia.Trivia}</p>`
+
+        triviaBody.insertAdjacentElement("beforeend", triviaContent);
+        triviaBody.innerHTML = "Hejsan";
+    });
+
+    
+
+    modal.style.display = "block";
+
+    span.onclick = function() {
+    modal.style.display = "none";
+  }
+  window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+}
+async function GetTrivia(){
+    
 }

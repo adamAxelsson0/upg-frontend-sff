@@ -10,13 +10,26 @@ function ShowLoginOrLoggedIn() {
 }
 function ShowLogin(){
     const loginDiv = document.getElementById("login");
+    const registerdiv = document.getElementById("register");
 
     loginDiv.innerHTML = 
     '<div class="login-container">'+
+     `<button onclick="Register()">Register</button>` +
+         '<div id="modal" class="modal">' +
+         '<div class="modal-content">'+
+         '<div class="modal-header">'+
+           '<span class="close">&times;</span>'+
+           `<h2>Register account</h2>`+
+         '</div>'+
+         '<div id="modal-body" class="modal-body">'+
+            
+         '</div>'+
+       '</div>'+
+         '</div>'+
       '<input type="text" placeholder="Username" id="username">'+
       '<input type="password" placeholder="Password" id="pw">'+
       '<button type="submit" onclick="Login()">Login</button>'+
-     '</div>'
+     '</div>';
 }
 function LoggedIn(){
     const loginDiv = document.getElementById("login");
@@ -54,4 +67,21 @@ async function Login(){
 async function Logout() {
     localStorage.removeItem("user");
     ShowLogin();
+}
+async function Register() {
+    var modal = document.getElementById("modal");
+    var span = document.getElementsByClassName("close")[0];
+    const triviaBody = document.getElementById("modal-body");
+
+
+    modal.style.display = "block";
+
+    span.onclick = function() {
+    modal.style.display = "none";
+  }
+  window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
 }
