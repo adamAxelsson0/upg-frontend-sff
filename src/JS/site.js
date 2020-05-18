@@ -124,17 +124,41 @@ async function AddTrivia(id) {
     alert("Your trivia was added");
 }
 async function Rent(filmid) {
-    await fetch('https://localhost:5001/api/RentedFilm', {
-        method: 'POST',
-        body: JSON.stringify({
-            filmId: Number(filmid),
-            studioId: Number(localStorage.UserId)
-
-        }),
-        headers: { 'Content-Type': 'application/json' }
+    //Check again if movie is in stock
+    const response = await fetch("https://localhost:5001/api/film");
+    var movies = await response.json();
+    movies.forEach(element => {
+        console.log(element)
     });
-    alert("Movie has been successfully rented");
-    location.reload();
+    movies = movies.filter(x => x.id == filmid && x.stock > 0)
+
+    if (movies.length > 0) {
+        await fetch('https://localhost:5001/api/RentedFilm', {
+            method: 'POST',
+            body: JSON.stringify({
+                filmId: Number(filmid),
+                studioId: Number(localStorage.UserId)
+
+            }),
+            headers: { 'Content-Type': 'application/json' }
+        });
+        await fetch('https://localhost:5001/api/film', {
+            method: 'PUT',
+            body: JSON.stringify({
+                id: Number(filmid),
+                name: movies[0].name,
+                stock: Number(movies[0].stock)
+            }),
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        alert("Movie has been successfully rented");
+        location.reload();
+    }
+    else{
+        alert("Movie is not in stock");
+    }
+
 }
 async function ReturnRental(filmid) {
     const response = await fetch("https://localhost:5001/api/RentedFilm");
