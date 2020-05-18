@@ -36,7 +36,7 @@ function LoggedIn() {
     userName = localStorage.UserName;
     loginDiv.innerHTML = '<div class="login-container">' +
         '<button type="submit" onclick="Logout()">Logout</button>' +
-        `<p>Logged in as ${userName}</p>` +
+        `<p>Hello ${userName}</p>` +
         '</div>';
 }
 async function Login() {
@@ -51,12 +51,13 @@ async function Login() {
         data.forEach(user => {
             if (user.password == pw && user.name == userName && user.verified == true) {
                 localStorage.UserName = user.name;
-                localStorage.Id = user.id;
+                localStorage.UserId = user.id;
             }
         });
         if (localStorage.UserName == null) {
             console.log("wrong login")
         }
+        location.reload();
         ShowLoginOrLoggedIn();
     } catch (error) {
         console.log(error);
@@ -64,22 +65,19 @@ async function Login() {
 }
 async function Logout() {
     localStorage.clear();
+    location.reload();
     ShowLogin();
 }
 
 
-async function Register() {
+function Register() {
     var modal = document.getElementById("modal-register");
     var span = document.getElementsByClassName("close")[0];
     const registerBody = document.getElementById("modal-body-register");
 
     registerBody.innerHTML = '<form id="registerForm">' +
-        '<label for="userName">Name of Studio:</label>' +
-        '<input type="text" id="userName" name="name">' +
-        '<br>' +
-        '<label for="pw">Password:</label>' +
-        '<input type="password" id="pw" name="password">' +
-        '<br>' +
+        '<input type="text" id="userName" name="name" placeholder="username">' +
+        '<input type="password" id="pw" name="password" placeholder="password">' +
         '<button type="submit" onclick="TryRegister()">Register</button>' +
         '</form>';
 
