@@ -1,54 +1,59 @@
-GetMovies();
+GetMovieCards();
 async function GetMovies() {
-    try {
-        const responseRental = await fetch("https://localhost:5001/api/RentedFilm");
-        const rentedData = await responseRental.json();
-        const response = await fetch("https://localhost:5001/api/film");
-        const data = await response.json();
-        const movieDiv = document.getElementById("movieList");
+    const response = await fetch("https://localhost:5001/api/film");
+    return await response.json();
+}
+async function GetRentals() {
+    const response = await fetch("https://localhost:5001/api/RentedFilm");
+    return await response.json();
+}
 
-        data.forEach(movie => {
-            if (movie.description == null) {
-                movie.description = "Noun. placeholder (plural placeholders) Something" +
-                    "used or included temporarily or as a substitute for something that " +
-                    "is not known or must remain generic; that which holds, denotes or " +
-                    "reserves a place for something to come later."
-            };
-            let movieCard = document.createElement("div");
-            movieCard.innerHTML =
-                "<div class=\"card\">" +
-                "<img src=\"https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png\" style=\"width:100%\" >" +
-                "<div class=\"container\">" +
-                `<h2><b>${movie.name}</b></h2>` +
-                `<p>${movie.description}</p>` +
-                `<p>In stock: ${movie.stock}</p>` +
-                "</div>" +
-                '<div id="card-footer"class="card-footer">' +
-                `<button onclick="ShowModal('${movie.name}');ShowTrivia(${movie.id});">Trivia</button>`;
+async function GetMovieCards() {
+    rentedData = await GetRentals();
+    data = await GetMovies();
+    const movieDiv = document.getElementById("movieList");
 
-            if (localStorage.UserName != null) {
-                rentedDataFiltered = rentedData.filter(x => x.filmId == movie.id && x.studioId == localStorage.UserId && x.returned == false);
-                movieCard.innerHTML += `<button onclick="ShowModal('${movie.name}');ShowAddTrivia(${movie.id});">Add Trivia</button>`;
+    data.forEach(movie => {
+        //Backend should add a movie.description property, temporary solution in the meantime
+        if (movie.description == null) {
+            movie.description = "Noun. placeholder (plural placeholders) Something" +
+                "used or included temporarily or as a substitute for something that " +
+                "is not known or must remain generic; that which holds, denotes or " +
+                "reserves a place for something to come later."
+        };
+        let movieCard = document.createElement("div");
+        movieCard.innerHTML =
+            "<div class=\"card\">" +
+            "<img src=\"https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png\" style=\"width:100%\" >" +
+            "<div class=\"container\">" +
+            `<h2><b>${movie.name}</b></h2>` +
+            `<p>${movie.description}</p>` +
+            `<p>In stock: ${movie.stock}</p>` +
+            "</div>" +
+            '<div id="card-footer"class="card-footer">' +
+            `<button onclick="ShowModal('${movie.name}');ShowTrivia(${movie.id});">Trivia</button>` +
+            "</div>" +
+            '<div id="modal-trivia" class="modal">' +
+            '</div>' +
+            "</div>";
 
-                if (rentedDataFiltered.length == 0) {
-                    movieCard.innerHTML += `<button onclick="Rent(${movie.id});">Rent</button>`;
-                }
-                else {
-                    movieCard.innerHTML += `<button onclick="ReturnRental(${movie.id});">Return Rental</button>`;
-                }
-            };
-            movieCard.innerHTML +=
-                "</div>" +
+        movieDiv.insertAdjacentElement("beforeend", movieCard);
 
-                '<div id="modal-trivia" class="modal">' +
-                //Modal goes here
-                '</div>' +
-                "</div>";
-            movieDiv.insertAdjacentElement("beforeend", movieCard);
-        });
-    } catch (error) {
-        console.log(error);
-    }
+        if (localStorage.UserName != null) {
+            rentedDataFiltered = rentedData.filter(x => x.filmId == movie.id && x.studioId == localStorage.UserId && x.returned == false);
+            document.getElementById("card-footer").insertAdjacentHTML("beforeend",
+                `<button onclick="ShowModal('${movie.name}');ShowAddTrivia(${movie.id});">Add Trivia</button>`);
+
+            if (rentedDataFiltered.length == 0) {
+                document.getElementById("card-footer").insertAdjacentHTML("beforeend",
+                `<button onclick="Rent(${movie.id});">Rent</button>`);
+            }
+            else {
+                document.getElementById("card-footer").insertAdjacentHTML("beforeend",
+                movieCard.innerHTML += `<button onclick="ReturnRental(${movie.id});">Return Rental</button>`);
+            }
+        }
+    });
 }
 function ShowModal(movieName) {
     var modal = document.getElementById("modal-trivia");
@@ -79,7 +84,6 @@ async function ShowTrivia(id) {
 
     modal.style.display = "block";
 
-    // When the user clicks on <span> (x), close the modal
     span.onclick = function () {
         modal.style.display = "none";
     }
@@ -101,7 +105,6 @@ function ShowAddTrivia(id) {
 
     modal.style.display = "block";
 
-    // When the user clicks on <span> (x), close the modal
     span.onclick = function () {
         modal.style.display = "none";
     }
@@ -125,54 +128,67 @@ async function AddTrivia(id) {
 }
 async function Rent(filmid) {
     //Check again if movie is in stock
-    const response = await fetch("https://localhost:5001/api/film");
-    var movies = await response.json();
-    movies.forEach(element => {
-        console.log(element)
-    });
-    movies = movies.filter(x => x.id == filmid && x.stock > 0)
+    var movies = await GetMovies();
+    movies = movies.filter(x => x.id == filmid && x.stock > 0);
 
     if (movies.length > 0) {
-        await fetch('https://localhost:5001/api/RentedFilm', {
-            method: 'POST',
-            body: JSON.stringify({
-                filmId: Number(filmid),
-                studioId: Number(localStorage.UserId)
+        try {
+            await fetch('https://localhost:5001/api/RentedFilm', {
+                method: 'POST',
+                body: JSON.stringify({
+                    filmId: Number(filmid),
+                    studioId: Number(localStorage.UserId)
+                }),
+                headers: { 'Content-Type': 'application/json' }
+            });
+            await fetch(`https://localhost:5001/api/film/${filmid}`, {
+                ///TODO Change Stock
+                method: 'PUT',
+                body: JSON.stringify({
+                    id: Number(filmid),
+                    name: movies[0].name,
+                    stock: Number(movies[0].stock - 1)
+                }),
+                headers: { 'Content-Type': 'application/json' }
+            });
+            alert("Movie has been successfully rented");
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+    else {
+        alert("Movie is not in stock");
+    }
+    location.reload();
+}
+async function ReturnRental(filmid) {
+    var rentedData = await GetRentals();
+    rentedDataFiltered = rentedData.filter(x => x.filmId == filmid && x.studioId == localStorage.UserId && x.returned == false);
+    rental = rentedDataFiltered[0];
+    rental.returned = true;
+    var movies = await GetMovies();
+    movies = movies.filter(x => x.id == filmid);
 
-            }),
+    try {
+        await fetch(`https://localhost:5001/api/RentedFilm/${rental.id}`, {
+            method: 'PUT',
+            body: JSON.stringify(rental),
             headers: { 'Content-Type': 'application/json' }
         });
-        await fetch('https://localhost:5001/api/film', {
+        await fetch(`https://localhost:5001/api/film/${filmid}`, {
+            ///TODO Change Stock
             method: 'PUT',
             body: JSON.stringify({
                 id: Number(filmid),
                 name: movies[0].name,
-                stock: Number(movies[0].stock)
+                stock: Number(movies[0].stock + 1)
             }),
             headers: { 'Content-Type': 'application/json' }
         });
-
-        alert("Movie has been successfully rented");
-        location.reload();
+        alert("Movie has been successfully been returned");
+    } catch (error) {
+        console.log(error);
     }
-    else{
-        alert("Movie is not in stock");
-    }
-
-}
-async function ReturnRental(filmid) {
-    const response = await fetch("https://localhost:5001/api/RentedFilm");
-    var rentedData = await response.json();
-    rentedDataFiltered = rentedData.filter(x => x.filmId == filmid && x.studioId == localStorage.UserId && x.returned == false);
-    rental = rentedDataFiltered[0];
-    rental.returned = true;
-    console.log(rental);
-
-    await fetch('https://localhost:5001/api/RentedFilm', {
-        method: 'PUT',
-        body: JSON.stringify(rental),
-        headers: { 'Content-Type': 'application/json' }
-    });
-    alert("Movie has been successfully been returned");
     location.reload();
 }
