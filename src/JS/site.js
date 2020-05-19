@@ -11,7 +11,8 @@ async function GetRentals() {
 async function GetMovieCards() {
     rentedData = await GetRentals();
     data = await GetMovies();
-    const movieDiv = document.getElementById("movieList");
+    const mainDiv = document.getElementById("main");
+    mainDiv.innerHTML = "";
 
     data.forEach(movie => {
         //Backend should add a movie.description property, temporary solution in the meantime
@@ -30,27 +31,27 @@ async function GetMovieCards() {
             `<p>${movie.description}</p>` +
             `<p>In stock: ${movie.stock}</p>` +
             "</div>" +
-            '<div id="card-footer"class="card-footer">' +
-            `<button onclick="ShowModal('${movie.name}');ShowTrivia(${movie.id});">Trivia</button>` +
+            `<div id="card-footer-${movie.id}"class="card-footer">` +
+            `<button class="card-button" onclick="ShowModal('${movie.name}');ShowTrivia(${movie.id});">Trivia</button>` +
             "</div>" +
             '<div id="modal-trivia" class="modal">' +
             '</div>' +
             "</div>";
 
-        movieDiv.insertAdjacentElement("beforeend", movieCard);
+            mainDiv.insertAdjacentElement("beforeend", movieCard);
 
         if (localStorage.UserName != null) {
             rentedDataFiltered = rentedData.filter(x => x.filmId == movie.id && x.studioId == localStorage.UserId && x.returned == false);
-            document.getElementById("card-footer").insertAdjacentHTML("beforeend",
-                `<button onclick="ShowModal('${movie.name}');ShowAddTrivia(${movie.id});">Add Trivia</button>`);
+            document.getElementById(`card-footer-${movie.id}`).insertAdjacentHTML("beforeend",
+                `<button class="card-button" onclick="ShowModal('${movie.name}');ShowAddTrivia(${movie.id});">Add Trivia</button>`);
 
             if (rentedDataFiltered.length == 0) {
-                document.getElementById("card-footer").insertAdjacentHTML("beforeend",
-                `<button onclick="Rent(${movie.id});">Rent</button>`);
+                document.getElementById(`card-footer-${movie.id}`).insertAdjacentHTML("beforeend",
+                `<button class="card-button" onclick="Rent(${movie.id});">Rent</button>`);
             }
             else {
-                document.getElementById("card-footer").insertAdjacentHTML("beforeend",
-                movieCard.innerHTML += `<button onclick="ReturnRental(${movie.id});">Return Rental</button>`);
+                document.getElementById(`card-footer-${movie.id}`).insertAdjacentHTML("beforeend",
+                `<button class="card-button" onclick="ReturnRental(${movie.id});">Return Rental</button>`);
             }
         }
     });

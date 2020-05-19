@@ -15,13 +15,15 @@ body{
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
-  font-size: 17px;}
+  font-size: 17px;
+}
 
 .topnav a:hover {
   background-color: #ddd;
   color: black;
 }
 .topnav a.active {
+  
   background-color: rgb(71, 6, 31);
   color: white;
 }
@@ -36,11 +38,15 @@ float: right;
 padding: 6px;
 margin-top: 8px;
 margin-right: 16px;
-background: #ddd;
+background:  rgb(71, 6, 31);
+color: white;
 font-size: 17px;
 border: none;
 cursor: pointer;
 }
+.topnav .login-container button:hover {
+  background: rgba(226, 226, 226, 0.507);
+  }
 
 .topnav .login-container p{
   float: right;
@@ -48,11 +54,7 @@ cursor: pointer;
   text-align: center;
   padding: 0px 16px;
   text-decoration: none;
-  font-size: 17px;}
-}
-
-.topnav .login-container button:hover {
-background: #ccc;
+  font-size: 15px;
 }
 
 .topnav input[type=text], input[type=password] {
@@ -89,6 +91,22 @@ background: #ccc;
   content: "";
   display: table;
   clear: both;
+}
+.card-button {
+  background-color: rgb(136, 5, 125); /* Green */
+  color: white;
+  padding: 5px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 12px;
+}
+.card-button:hover {
+  background-color:rgba(136, 5, 125, 0.295);
+  color: black;
 }
 
 @media screen and (max-width: 600px) {
