@@ -42,6 +42,9 @@ body{
   border: none;
   cursor: pointer;
   }
+  .topnav .admin-options button:hover {
+    background: rgba(226, 226, 226, 0.507);
+    }
 .topnav .login-container button{
 float: right;
 padding: 6px;
