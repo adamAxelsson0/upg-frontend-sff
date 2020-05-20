@@ -87,8 +87,6 @@ async function Logout() {
     location.reload();
     ShowLogin();
 }
-
-
 function Register() {
     var modal = document.getElementById("modal-register");
     var span = document.getElementsByClassName("close")[0];
@@ -97,7 +95,7 @@ function Register() {
     registerBody.innerHTML = '<form id="registerForm">' +
         '<input type="text" id="userName" name="name" placeholder="username">' +
         '<input type="password" id="pw" name="password" placeholder="password">' +
-        '<button type="submit" onclick="TryRegister()">Register</button>' +
+        '<button type="submit" onclick="PostRegister()">Register</button>' +
         '</form>';
 
     modal.style.display = "block";
@@ -111,7 +109,7 @@ function Register() {
         }
     }
 }
-async function TryRegister() {
+async function PostRegister() {
     try {
         const thisForm = document.getElementById('registerForm');
         const formData = new FormData(thisForm).entries()
@@ -130,7 +128,7 @@ function AddAdminOptions() {
     const topnavDiv = document.getElementById("topnav");
     const adminDiv = document.createElement("div");
 
-    adminDiv.innerHTML = '<div id="admin-options">' +
+    adminDiv.innerHTML = '<div class="admin-options" id="admin-options">' +
         `<button onclick="AddMovieForm()">Add Movie</button>` +
         `<button onclick="SeeRentals()">See Rentals</button>` +
         `<button onclick="VerifyStudios()">Verify Studios</button>` +
@@ -140,46 +138,112 @@ function AddAdminOptions() {
     topnavDiv.insertAdjacentElement("beforeend", adminDiv);
 }
 function AddMovieForm() {
-    mainDiv.innerHTML = '<form id="addMovieForm" name="addMovieForm">' +
+    mainDiv.innerHTML = '<div class="addMovieInfo"' +
         '<label for="fname">Movie Title:</label>' +
-        '<input type="text" id="addMovie-MovieName" name="name" placeholder="Blade Runner 2049">' +
+        '<input type="text" id="addMovie-MovieName" name="name" placeholder="...">' +
         '<label for="fname">Stock:</label>' +
         '<input type="number" min=0 max=99 id="addMovie-Stock" name="stock" placeholder="0">' +
         '<button type="submit" onclick="AddMovie()">Add Movie</button>' +
-        '</form>';
+        '</div>';
 }
 async function AddMovie() {
     try {
-        let myForm = document.getElementById('addMovieForm');
-        let formData = new FormData(myForm);
-        console.log(formData);
+        let movieName = document.getElementById('addMovie-MovieName').value;
+        let movieStock = document.getElementById('addMovie-Stock').value;
+
         await fetch('https://localhost:5001/api/film', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(Object.fromEntries(formData))
+            body: JSON.stringify({
+                name: movieName,
+                stock: Number(movieStock)
+            }),
+            headers: { 'Content-Type': 'application/json' }
         });
         alert("Movie was added. Great success!");
+        location.reload();
+
     } catch (error) {
         alert(error);
     }
 }
 async function SeeRentals() {
-    const response = await fetch("https://localhost:5001/api/RentedFilm");
-    data = await response.json();
-    mainDiv.innerHTML = '<h1>Rentals:</h1>';
-    data = data.filter(x => x.returned == false);
 
-    data.forEach(element => {
-        mainDiv.innerHTML += 
-        `<p>Film ID: </p>`+
-       `<p>${element.filmId}</p>`+
-       `<p>FilmStudio ID: </p>`+
-       `<p>${element.studioId}</p>`+
-       '<br>'
-       ;
-    });
+    var response = await fetch("https://localhost:5001/api/RentedFilm");
+    var rentedFilmData = await response.json();
+    response = await fetch("https://localhost:5001/api/film");
+    var filmData = await response.json();
+    response = await fetch("https://localhost:5001/api/filmstudio");
+    var filmStudioData = await response.json();
 
+    mainDiv.innerHTML = '<h1 class="columns-h1">Rentals:</h1>';
+
+    if (rentedFilmData.filter(x => x.returned == false).length == 0) {
+        mainDiv.innerHTML +=
+            '<p>No rentals currently</p>'
+    } else {
+            rentedFilmData.filter(x => x.returned == false).forEach(rental => {
+            var film = filmData.find(x => x.id == rental.filmId);
+            var filmStudio = filmStudioData.find(x => x.id == rental.studioId);
+            rental.filmName = film.name;
+            rental.studioName = filmStudio.name;
+
+            mainDiv.innerHTML +=
+                '<div class="columns">' +
+                '<ul class="column">' +
+                `<li class="header">Rental</li>` +
+                `<li>ID: ${rental.id}</li>` +
+                `<li>Movie ID: ${rental.filmId}</li>` +
+                `<li>Movie: ${rental.filmName}</li>` +
+                `<li>Studio ID: ${rental.studioId}</li>` +
+                `<li>Studio: ${rental.studioName}</li>` +
+                '</ul>' +
+                '</div>'
+        });
+    }
 }
-function VerifyStudios() {
+async function VerifyStudios() {
+    response = await fetch("https://localhost:5001/api/filmstudio");
+    var filmStudioData = await response.json();
 
+    mainDiv.innerHTML = '<h1 class="columns-h1">Studios To Verify:</h1>';
+
+    if (filmStudioData.filter(x => x.verified == false).length == 0) {
+        mainDiv.innerHTML +=
+            '<p>No studios to verify.</p>'
+    } else {
+        filmStudioData.filter(x => x.verified == false).forEach(studio => {
+            mainDiv.innerHTML +=
+                '<div class="columns">' +
+                '<ul class="column">' +
+                `<li class="header">Studio ${studio.name}</li>` +
+                `<li>ID: ${studio.id}</li>` +
+                `<li>Name: ${studio.name}</li>` +
+                `<li>Password: ${studio.password}</li>` +
+                `<li class="footer"><button onclick="StudioVerification(${studio.id})">Verify</button></li>` +
+                '</ul>' +
+                '</div>'
+        });
+
+    }
+}
+async function StudioVerification(id) {
+    try {
+        const response = await fetch(`https://localhost:5001/api/filmstudio/${id}`);
+        studio = await response.json();
+        await fetch(`https://localhost:5001/api/filmstudio/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify({
+                id: Number(id),
+                name: studio.name,
+                password: studio.password,
+                verified: true
+            }),
+            headers: { 'Content-Type': 'application/json' }
+        });
+        alert("Studio was verified");
+        location.reload();
+
+    } catch (error) {
+        alert(error);
+    }
 }

@@ -31,8 +31,17 @@ body{
 .topnav .login-container {
   float: right;
 }
-
-/* Style the button inside the input container */
+.topnav .admin-options button{
+  float: left;
+  padding: 6px;
+  margin-top: 8px;
+  margin-right: 16px;
+  background:  rgb(71, 6, 31);
+  color: white;
+  font-size: 17px;
+  border: none;
+  cursor: pointer;
+  }
 .topnav .login-container button{
 float: right;
 padding: 6px;
@@ -65,10 +74,6 @@ cursor: pointer;
   margin-right: 16px;
   font-size: 17px;
 }
-
-.movieList{
-  margin: 0 -5px;
-}
 .card {
   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
   text-align: center;
@@ -93,7 +98,7 @@ cursor: pointer;
   clear: both;
 }
 .card-button {
-  background-color: rgb(136, 5, 125); /* Green */
+  background-color: rgb(136, 5, 125);
   color: white;
   padding: 5px;
   text-align: center;
