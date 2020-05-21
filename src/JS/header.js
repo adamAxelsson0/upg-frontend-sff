@@ -139,10 +139,14 @@ function AddAdminOptions() {
 }
 function AddMovieForm() {
     mainDiv.innerHTML = '<div class="addMovieInfo"' +
-        '<label for="fname">Movie Title:</label>' +
+        '<label>Movie:</label>' +
+        '<br>' +
         '<input type="text" id="addMovie-MovieName" name="name" placeholder="...">' +
-        '<label for="fname">Stock:</label>' +
+        '<br>' +
+        '<label>Stock:</label>' +
+        '<br>' +
         '<input type="number" min=0 max=99 id="addMovie-Stock" name="stock" placeholder="0">' +
+        '<br>' +
         '<button type="submit" onclick="AddMovie()">Add Movie</button>' +
         '</div>';
 }
@@ -181,7 +185,7 @@ async function SeeRentals() {
         mainDiv.innerHTML +=
             '<p>No rentals currently</p>'
     } else {
-            rentedFilmData.filter(x => x.returned == false).forEach(rental => {
+        rentedFilmData.filter(x => x.returned == false).forEach(rental => {
             var film = filmData.find(x => x.id == rental.filmId);
             var filmStudio = filmStudioData.find(x => x.id == rental.studioId);
             rental.filmName = film.name;
@@ -241,7 +245,7 @@ async function StudioVerification(id) {
             headers: { 'Content-Type': 'application/json' }
         });
         alert("Studio was verified");
-        location.reload();
+        VerifyStudios();
 
     } catch (error) {
         alert(error);
