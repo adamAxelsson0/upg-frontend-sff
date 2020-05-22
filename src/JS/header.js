@@ -53,7 +53,6 @@ function LoggedInAdmin() {
         '</div>';
 }
 async function Login() {
-    let user, password = "";
     var admin = { userName: "admin", pw: "admin" }
     userName = document.getElementById("username").value;
     pw = document.getElementById("pw").value
@@ -66,13 +65,15 @@ async function Login() {
             const response = await fetch("https://localhost:5001/api/filmstudio");
             const data = await response.json();
 
-            data.forEach(user => {
-                if (user.password == pw && user.name == userName && user.verified == true) {
-                    localStorage.UserName = user.name;
-                    localStorage.UserId = user.id;
-                }
-            });
-            if (localStorage.UserName == null) {
+            let user = data.find(x => x.password == pw && x.name == userName && x.verified == true);
+            console.log(user);
+
+
+            if (user != undefined) {
+                localStorage.UserName = user.name;
+                localStorage.UserId = user.id;
+            }
+            else {
                 alert("Incorrect login")
             }
         } catch (error) {
@@ -152,8 +153,8 @@ function AddMovieForm() {
 }
 async function AddMovie() {
     try {
-        let movieName = document.getElementById('addMovie-MovieName').value;
-        let movieStock = document.getElementById('addMovie-Stock').value;
+        const movieName = document.getElementById('addMovie-MovieName').value;
+        const movieStock = document.getElementById('addMovie-Stock').value;
 
         await fetch('https://localhost:5001/api/film', {
             method: 'POST',
